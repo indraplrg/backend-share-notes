@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"backend/internal/database"
+	"log"
+)
 
 func main() {
-	fmt.Println("Hallo dunia")
+	db, err := database.GetDBConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
 }
