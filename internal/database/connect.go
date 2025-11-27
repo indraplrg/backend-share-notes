@@ -1,17 +1,19 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func GetDBConnection() (*sql.DB, error) {
-	connStr := "user=void dbname=share_notes sslmode=verify-full"
+var DB *gorm.DB
 
-	db, err := sql.Open("postgres", connStr)
+func GetDBConnection() (*gorm.DB, error) {
+	connStr := "user=void password=voidajalah port=5432 dbname=share_notes sslmode=disable"
+
+	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)

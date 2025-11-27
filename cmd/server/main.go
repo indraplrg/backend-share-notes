@@ -2,7 +2,11 @@ package main
 
 import (
 	"backend/internal/database"
+	"backend/internal/models"
+	"backend/internal/routes"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -11,5 +15,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	db.AutoMigrate(&models.User{})
+	r := gin.Default()
+
+	
+	routes.AuhtenticationRoute(r, db)
+
+	r.Run(":3000")
 }
