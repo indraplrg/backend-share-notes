@@ -18,7 +18,7 @@ func AuhtenticationRoute(r *gin.Engine, db *gorm.DB) {
 	group := r.Group("/api/auth")
 	{
 		group.POST("/register", controller.Register)
-		// group.POST("/login", controllers.Register)
+		group.POST("/login", controller.Login)
 		// group.POST("/verify", controllers.Register)
 		// group.POST("/profile", controllers.Register)
 	}

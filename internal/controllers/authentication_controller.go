@@ -17,7 +17,7 @@ func NewAuthController(service services.AuthService) *AuthController {
 }
 
 func (c *AuthController) Register(ctx *gin.Context) {
-	var req models.RegisterRequest
+	var req models.UserRequest
 	
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, models.Response{
@@ -49,5 +49,34 @@ func (c *AuthController) Register(ctx *gin.Context) {
 		Success: true,
 		Message: "Berhasil membuat akun",
 		Data: response,
+	})
+}
+
+func (c *AuthController) Login(ctx *gin.Context) {
+	var req models.UserRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, models.Response{
+			Success: false,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	token, err := c.service.Login(ctx, req.Email, req.Password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.Response{
+			Success: false,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Berhasil Login",
+		Data: token,
 	})
 }

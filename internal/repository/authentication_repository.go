@@ -3,6 +3,7 @@ package repository
 import (
 	"backend/internal/models"
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -24,6 +25,9 @@ func (r *authRepository) FindByEmail(ctx context.Context, email string) (*models
 	var user models.User
 
 	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
