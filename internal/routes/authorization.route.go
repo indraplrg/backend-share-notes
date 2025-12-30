@@ -10,6 +10,6 @@ func AuthorizationRoute(r *gin.Engine, controller *controllers.AuthorizationCont
 
 	group := r.Group("/api/auth")
 	{
-		group.GET("/verify-email", controller.VerifyEmail)
+		group.GET("/verify-email/:token", controller.VerifyEmail)
 	}
 }

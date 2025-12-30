@@ -33,7 +33,7 @@ func (m *Mailer) SendVerification(to string, token string) error {
 	msg := gomail.NewMessage()
 
 	verifyUrl := fmt.Sprintf(
-		"%s/verify-email?token=%s",
+		"%s/api/auth/verify-email/%s",
 		m.baseUrl,
 		token,
 	)

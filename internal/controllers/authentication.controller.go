@@ -36,7 +36,7 @@ func (c *AuthenticationController) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusConflict, dtos.Response{
 			Success: false,
 			Message: err.Error(),
-			Data: status, 
+			Data: nil, 
 			
 		})
 		return	
