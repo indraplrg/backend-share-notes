@@ -38,7 +38,7 @@ func (s *authenticationService) Register(ctx context.Context, dto dtos.UserReque
 	})
 
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return nil, errors.New("gagal mengecek user")
 	}
 
@@ -49,7 +49,7 @@ func (s *authenticationService) Register(ctx context.Context, dto dtos.UserReque
 	// hashing password
 	hashedPassword, err := auth.HashingPassword(dto.Password)
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return nil, errors.New("gagal hashing password")
 	}
 
@@ -62,7 +62,7 @@ func (s *authenticationService) Register(ctx context.Context, dto dtos.UserReque
 
 	err = s.repo.CreateOne(ctx, User)
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return nil, errors.New("gagal membuat akun")
 	}
 
@@ -77,14 +77,14 @@ func (s *authenticationService) Register(ctx context.Context, dto dtos.UserReque
 
 	err = s.repo.CreateOne(ctx, emailVerification)
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return nil, errors.New("Gagal membuat verifikasi token")
 	}
 
 
 	// kirim verifikasi email
 	if err := s.mailer.SendVerification(dto.Email, emailVerification.Token); err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return nil, errors.New("gagal mengirim email verifikasi")
 	}
 
@@ -99,7 +99,7 @@ func (s *authenticationService) Login(ctx context.Context, dto dtos.LoginRequest
 	})
 
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return "" ,	errors.New("gagal mengecek user")
 	}
 
@@ -114,20 +114,20 @@ func (s *authenticationService) Login(ctx context.Context, dto dtos.LoginRequest
 	// cek password kalau sama
 	err = auth.ComparePassword(user.Password, dto.Password)
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return "" , errors.New("password yang anda masukkan salah")
 	}
 
 	// buat token paseto
 	acessToken, err := token.CreateToken(user, time.Now().Add(30 * time.Minute))
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return "" , errors.New("gagal membuat token")
 	}
 
 	refreshToken, err := token.CreateToken(user, time.Now().Add(168 * time.Minute))
 	if err != nil {
-		logrus.Info(err)
+		logrus.WithError(err)
 		return "" , errors.New("gagal membuat token")
 	}
 
@@ -141,6 +141,7 @@ func (s *authenticationService) Login(ctx context.Context, dto dtos.LoginRequest
 
 	err = s.repo.CreateOne(ctx, Token)
 	if err != nil {
+		logrus.WithError(err)
 		return "", errors.New("gagal menyimpan token")
 	}
 

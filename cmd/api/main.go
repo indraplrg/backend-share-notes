@@ -14,35 +14,38 @@ import (
 )
 
 func main() {
-	// set logger
-	logger := logrus.New()
 
 	// load config
-	config, err := viper.LoadConfig(logger)
+	config, err := viper.LoadConfig()
 	if err != nil {
-		logger.Fatal(err)
+		logrus.Info("gagal me-load config")
+		logrus.Fatal(err)
 	} 
+	logrus.Info("berhasi membaca config")
 
 	// koneksi ke database
-	db, err := database.GetDBConnection(config, logger)
+	db, err := database.GetDBConnection(config)
 	if err != nil {
-		logger.Fatal(err)
+		logrus.Info("gagal terhubung ke database")
+		logrus.Fatal(err)
 	}
-	logger.Info("Berhasil terhubung ke database")
+	logrus.Info("Berhasil terhubung ke database")
 
 	// koneksi ke redis
-	redisClient, err := cache.GetRedisConnection()
+	redisClient, err := cache.GetValkeyConnection()
 	if err != nil {
-		logger.Fatal(err)
+		logrus.Info("gagal terhubung ke valkey")
+		logrus.Fatal(err)
 	}
-	logger.Info("Berhasil terhubung ke valkey")
+	logrus.Info("Berhasil terhubung ke valkey")
 
 	// buat migrasi
 	err = database.CreateMigrationTable(db)
 	if err != nil {
-		logger.Fatal(err)
+		logrus.Info("gagal membuat migrasi")
+		logrus.Fatal(err)
 	}
-	logger.Info("Berhasil membuat migrasi tabel")
+	logrus.Info("Berhasil membuat migrasi tabel")
 
 
 	// insialisasi rute
@@ -50,6 +53,8 @@ func main() {
 
 	// gunakan middleware
 	r.Use(middleware.RateLimit(redisClient))
+	r.Use(middleware.RequestLogger())
+	r.Use(middleware.Origin())
 
 	container := container.NewContainer(db, config)
 	routes.RegisterRoutes(r, container)

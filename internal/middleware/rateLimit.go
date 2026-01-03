@@ -8,7 +8,6 @@ import (
 	ratelimit "github.com/JGLTechnologies/gin-rate-limit"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 )
 
 
@@ -27,7 +26,6 @@ func RateLimit(redisClient *redis.Client) gin.HandlerFunc {
 			})
 			},
 			KeyFunc: func(c *gin.Context) string{
-				logrus.Info("hit api dari", c.ClientIP())
 				return c.ClientIP()
 			},
 		})

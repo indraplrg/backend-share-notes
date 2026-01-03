@@ -6,7 +6,6 @@ import (
 	"share-notes-app/internal/services"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type AuthorizationController struct {
@@ -19,7 +18,6 @@ func NewAuthorizationsController(service services.AuthorizationService) *Authori
 
 func (c *AuthorizationController) VerifyEmail(ctx *gin.Context) {
 	token := ctx.Param("token")
-	logrus.Info(token, "ini token")
 	
 	ok, err := c.service.VerifyEmail(ctx, token)
 	if err != nil {

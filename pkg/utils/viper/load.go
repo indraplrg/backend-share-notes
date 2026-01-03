@@ -1,7 +1,6 @@
 package viper
 
 import (
-	"fmt"
 	"share-notes-app/configs"
 
 	"github.com/joho/godotenv"
@@ -9,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func LoadConfig(logger *logrus.Logger) (*configs.Config ,error) {
+func LoadConfig() (*configs.Config ,error) {
 	// load json config
 	viper.SetConfigName("app.config")
 	viper.SetConfigType("json")
@@ -19,27 +18,23 @@ func LoadConfig(logger *logrus.Logger) (*configs.Config ,error) {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			logger.Warn("Config file not found")
+			logrus.Warn("Config file not found")
 		} else {
-			logger.WithError(err).Error("Error reading file config")
-			return nil, fmt.Errorf("Error reading config file: %w", err)
+			return nil, err
 		}
 	} else {
-		logger.WithField("config_file", viper.ConfigFileUsed()).Info("Config file loaded")
+		logrus.WithField("config_file", viper.ConfigFileUsed()).Info("Config file loaded")
 	}
 
 	var config configs.Config
 	if err := viper.Unmarshal(&config); err != nil {
-		logger.WithError(err).Error("Failed unmarshal config")
-		return nil, fmt.Errorf("Failed unmarsahl config: %w", err)
+		return nil, err
 	}	
 	
 	// load env config
 	if err := godotenv.Load(); err != nil {
-		logger.WithError(err).Error("Failed to load .env file")
-		return nil, fmt.Errorf("Failed to load .env file: %v", err)
+		return nil, err
 	}
 
-	logger.Info("Config loaded successfully")
 	return &config, nil
 } 

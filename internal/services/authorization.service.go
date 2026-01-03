@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"share-notes-app/internal/repositories"
 	"time"
 
@@ -22,32 +22,33 @@ func NewAuthorizationsService(repo repositories.AuthorizationRepositories) Autho
 }
 
 func (s *authorizationService) VerifyEmail(ctx context.Context, token string) (string, error) {
-	// cek token kalau ada
-	logrus.Info(token, "ini token dari controller")
 
+	// cek token kalau ada
 	emailVerify, err := s.repo.GetToken(ctx, token)
-	logrus.Info(emailVerify, "ini model dari repository")
+
 	if err != nil {
-		return "", fmt.Errorf("gagal mengambil token: %w", err)
+		logrus.WithError(err)
+		return "", errors.New("gagal mengambil token")
 	}
 
 	if emailVerify == nil {
-		return "", fmt.Errorf("token tidak ditemukan")
+		return "", errors.New("token tidak ditemukan")
 	}
 
 	if emailVerify.IsUsed {
-		return "", fmt.Errorf("token sudah digunakan")
+		return "", errors.New("token sudah digunakan")
 	}
 
 	if time.Now().After(emailVerify.ExpiresAt) {
-		return "", fmt.Errorf("token sudah kadaluarsa")
+		return "", errors.New("token sudah kadaluarsa")
 	}
 
 
 	// update status verifikasi
 	err = s.repo.UpdateOneUsers(ctx, emailVerify)
 	if err != nil {
-		return "", fmt.Errorf("gagal mengupdate status: %w", err)
+		logrus.WithError(err)
+		return "", errors.New("gagal mengupdate status")
 	} 
 
 	return "berhasil meng-update status verifikasi", nil

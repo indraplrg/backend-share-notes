@@ -8,16 +8,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GetRedisConnection() (*redis.Client, error) {
+func GetValkeyConnection() (*redis.Client, error) {
 	address := fmt.Sprintf("%v:%v", viper.GetString("redis.host"), viper.GetString("redis.port"))
 
-	redisClient := redis.NewClient(&redis.Options{
+	valkeyClient := redis.NewClient(&redis.Options{
 		Addr: address,
 	})
 	
-	if redisClient == nil {
-		return nil, errors.New("failed connect to redis")
+	if valkeyClient == nil {
+		return nil, errors.New("failed connect to valkey")
 	}
 
-	return redisClient, nil
+	return valkeyClient, nil
 }
